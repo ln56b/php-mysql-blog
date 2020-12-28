@@ -2,7 +2,11 @@
 require dirname(__DIR__) . '/vendor/autoload.php';
 $faker = Faker\Factory::create('en_EN');
 
-$pdo = new PDO('mysql:dbname=phpblog;host=127.0.0.1', 'root', 'mySQLn56baud', [
+include '../config/conf.php';
+/** @var TYPE_NAME $db */
+/** @var TYPE_NAME $user */
+/** @var TYPE_NAME $password */
+$pdo = new PDO('mysql:dbname=' . $db . ';host=127.0.0.1', $user, $password, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 ]);
 
