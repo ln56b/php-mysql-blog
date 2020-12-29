@@ -1,42 +1,26 @@
 <?php
 
+use App\Connection;
 use App\Helpers\Text;
 use App\Model\Post;
+use App\URL;
 use PharIo\Manifest\ElementCollectionException;
 
-include '../config/conf.php';
-
 $title = 'My website';
+include '../config/conf.php';
 /** @var TYPE_NAME $db */
 /** @var TYPE_NAME $user */
 /** @var TYPE_NAME $password */
-$pdo = new PDO('mysql:dbname=' . $db . ';host=127.0.0.1', $user, $password, [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-]);
-
+$pdo = Connection::getPDO($db, $user, $password);
 $page = $_GET['page'] ?? 1;
 
-// Useful for SEO as it avoids an infinity of url made of float numbers
-if (!filter_var($page, FILTER_VALIDATE_INT)) {
-    throw new Exception('The page number should be an integer');
-}
+$currentPage = URL::getPositiveInt('page', 1);
 
-// Useful for SEO as well as page 1 does not exist in params
-if ($page === '1') {
-    header('Location: ' . $router->url('home'));
-    http_response_code(301);
-    exit();
-}
 $count = (int)$pdo->query('SELECT COUNT(id) FROM post')->fetch(PDO::FETCH_NUM)[0];
 $perPage = 12;
 $pages = ceil($count / $perPage);
 // If no page param in url, set to 1.
-$currentPage = (int)$page;
 
-// If this equals to 0 because the conversion ton int meant nothing, set to 1.
-if ($currentPage <= 0) {
-    throw new Exception('Invalid page number');
-}
 if ($currentPage > $pages) {
     throw new Exception('This page does not exist');
 }

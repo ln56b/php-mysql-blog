@@ -10,6 +10,22 @@ $whoops = new \Whoops\Run;
 $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
 $whoops->register();
 
+// Useful for SEO if page 1 does not exist in params
+if (isset($_GET['page']) && $_GET['page'] === '1') {
+    // Rewrite url without parameter
+    $uri = explode('?', $_SERVER['REQUEST_URI'])[0];
+    // Ensure we keep intact the super global.
+    $get = $_GET;
+    unset($get['page']);
+    $query = http_build_query($get);
+    if (!empty($query)) {
+        $query = $uri . '?' . $query;
+    }
+    http_response_code(301);
+    header('Location: ' . $uri);
+    exit();
+}
+
 $router = new Router(dirname(__DIR__) . '/views');
 
 $router
